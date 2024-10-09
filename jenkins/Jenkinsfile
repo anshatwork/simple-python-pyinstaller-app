@@ -2,22 +2,26 @@ pipeline {
     agent {
         label 'master'
     }
+    
     stages {
-        stage('Run Python Scripts') {
+        stage('Run Python Script') {
             steps {
-                echo "Running Python scripts..."
-                // Run the Python scripts and echo the output
+                echo "Running add2vals.py with arguments 5 and 5..."
+                // Run the add2vals.py script with arguments 5 and 5
                 sh '''
-                for script in sources/*.py; do
-                    echo "Running $script..."
-                    python3 $script
-                done
+                python3 sources/add2vals.py 5 5
                 '''
-                // Stash the results for later use
+                // Stash the results if needed for later use
                 stash(name: 'compiled-results', includes: 'sources/*.py*')
             }
         }
-        
     }
     
+    post {
+        always {
+            // Unstash the results if needed in later stages
+            unstash 'compiled-results'
+            echo "Stashed Python scripts and bytecode."
+        }
+    }
 }
